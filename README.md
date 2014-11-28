@@ -39,8 +39,8 @@ $ sudo service docker restart
 ### Run a Docker Container
 #### Pull from Repository
 - busybox
-`docker run --name busy busybox echo hi
-- web server
+`docker run --name busy busybox echo hi`
+- web server (**start from here later**)
 
 #### Create Docker Images
 - dockerfile
