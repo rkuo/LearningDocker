@@ -76,19 +76,41 @@ hello
 hello
 ... [snip] ...
 ```
+Since this container is running as daemon, we can get its status with `docker ps`
+
+```
+dockeruser@docker-vm:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS               NAMES
+f5361a5bce02        ubuntu:14.04        /bin/sh -c 'while tr   10 minutes ago      Up 10 minutes                           hello_daemon        
+```
+
 
 We can stop a container, `docker stop hello_daemon`
 
 #### Create Docker Images
-- create a project directory, `mkdir dockerproj1`, then 
-- change it to project directory, `cd dockerproj1`,
+- create a project directory, `mkdir webserver`, then 
+- change it to project directory, `cd webserver`,
 - use text editor to create a Dockerfile, with contents:
 
+- build image, in the project directory, where Dockerfile is located, 
 
-- web server (**start from here later**)
- 
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker build -t="rkuo/webserver" .
+... [snip] ...
+Step 5 : expose 80
+ ---> Running in 01a7494bde6b
+ ---> f595086394a8
+Removing intermediate container 01a7494bde6b
+Successfully built f595086394a8
+dockeruser@docker-vm:~/Projects/webserver$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+rkuo/webserver      latest              f595086394a8        57 seconds ago      231.8 MB
+ubuntu              14.04               86ce37374f40        4 days ago          192.7 MB
+busybox             latest              e72ac664f4f0        8 weeks ago         2.433 MB
+```
+
 ### Persist Data 
-- volume
+- volume (**start from here later**)
 - data container
 
 ### Link Containers
