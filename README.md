@@ -17,6 +17,7 @@
 
 ```
 # Add the docker group if it doesn't already exist.
+# **In VM, with docker installed**,
 $ sudo groupadd docker
 
 # Add the connected user "${USER}" to the docker group.
@@ -40,10 +41,51 @@ $ sudo service docker restart
 #### Pull from Repository
 - busybox
 `docker run --name busy busybox echo hi`
-- web server (**start from here later**)
+or 
+
+```
+dockeruser@docker-vm:~$ docker run --name richard -it ubuntu:14.04 /bin/bash
+Unable to find image 'ubuntu:14.04' locally
+Pulling repository ubuntu
+86ce37374f40: Pulling dependent layers 
+... [snip] ...
+```
+This will install ubuntu images, version 14.04.
+
+```
+root@c0a64302f2ed:/# ls  
+bin  boot  dev	etc  home  lib	lib64  media  mnt  opt	proc  root  run  sbin  srv  sys  tmp  usr  var
+root@c0a64302f2ed:/# hostname
+c0a64302f2ed
+root@c0a64302f2ed:/# 
+```
+
+We can inspect docker's process, `docker top hell_daemon`
+
+```
+dockeruser@docker-vm:~$ docker run --name hello_daemon -d ubuntu:14.04 /bin/sh -c "while true; do echo hello; sleep 1; done"
+f5361a5bce02ec97ed08c08578ab49eb61b2fe262393ac48bca67057d3487fce
+dockeruser@docker-vm:~$ docker top hello_daemon 
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                3497                1256                0                   11:22               ?                   00:00:00            /bin/sh -c while true; do echo hello; sleep 1; done
+root                3561                3497                0                   11:22               ?                   00:00:00            sleep 1
+dockeruser@docker-vm:~$ docker logs hello_daemon 
+hello
+hello
+hello
+hello
+... [snip] ...
+```
+
+We can stop a container, `docker stop hello_daemon`
 
 #### Create Docker Images
-- dockerfile
+- create a project directory, `mkdir dockerproj1`, then 
+- change it to project directory, `cd dockerproj1`,
+- use text editor to create a Dockerfile, with contents:
+
+
+- web server (**start from here later**)
  
 ### Persist Data 
 - volume
