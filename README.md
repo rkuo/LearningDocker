@@ -153,9 +153,10 @@ hi everyone, from nginx container
 ```
 
 You can create a images from your github account too. 
+
 ```
-dockeruser@docker-vm:~/Projects/webserver$ docker build -t="rkuo/webfromgit:v1" git://github.com/rkuo/learningDocker.git
-Sending build context to Docker daemon 57.34 kB
+dockeruser@docker-vm:~/Projects/webserver$ docker build -t="rkuo/webfromgit:v2" git://github.com/rkuo/learningDocker.git
+Sending build context to Docker daemon 62.98 kB
 Sending build context to Docker daemon 
 Step 0 : from ubuntu:14.04
  ---> 86ce37374f40
@@ -168,19 +169,74 @@ Step 2 : run apt-get update
 Step 3 : run apt-get install -y nginx
  ---> Using cache
  ---> d2a6866edd3e
-Step 4 : run echo 'hi everyone, from nginx container'    > /usr/share/nginx/html/index.html
- ---> Using cache
- ---> 95c0a1aa50bb
+Step 4 : run echo 'hi everyone, this is from nginx container in git'    > /usr/share/nginx/html/index.html
+ ---> Running in fc54ad0d65ed
+ ---> 0600f29eb7e9
+Removing intermediate container fc54ad0d65ed
 Step 5 : expose 80
- ---> Using cache
- ---> f595086394a8
-Successfully built f595086394a8
+ ---> Running in 3ab5dbc21d36
+ ---> 16d65c4feca1
+Removing intermediate container 3ab5dbc21d36
+Successfully built 16d65c4feca1
 dockeruser@docker-vm:~/Projects/webserver$ 
 ``` 
 
+Multiple versions can be created with different tags,
+
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+rkuo/webfromgit     v2                  16d65c4feca1        2 minutes ago       231.8 MB
+rkuo/webserver      latest              f595086394a8        2 hours ago         231.8 MB
+rkuo/webfromgit     v1                  f595086394a8        2 hours ago         231.8 MB
+ubuntu              14.04               86ce37374f40        4 days ago          192.7 MB
+busybox             latest              e72ac664f4f0        8 weeks ago         2.433 MB
+```
+
+We can test this github version,
+
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker run -d -p 80 --name web2 rkuo/webfromgit:v2 nginx -g "daemon off;"
+1ca1b2c5a02cfd5c4505cee90080e8e3315d43f2c682d951d0afbacdf0399a57
+dockeruser@docker-vm:~/Projects/webserver$ docker ps
+CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                   NAMES
+1ca1b2c5a02c        rkuo/webfromgit:v2   nginx -g 'daemon off   8 seconds ago       Up 7 seconds        0.0.0.0:49154->80/tcp   web2                
+216975f80cf2        rkuo/webfromgit:v1   nginx -g 'daemon off   About an hour ago   Up About an hour    0.0.0.0:49153->80/tcp   web                 
+f5361a5bce02        ubuntu:14.04         /bin/sh -c 'while tr   5 hours ago         Up 5 hours                                  hello_daemon        
+dockeruser@docker-vm:~/Projects/webserver$ curl http://0.0.0.0:49154
+hi everyone, this is from nginx container in git
+dockeruser@docker-vm:~/Projects/webserver$ 
+```
+It works. It displays different message from index.html.
 
 ### Persist Data 
-- volume (**start from here later**)
-- data container
+- volume [reference](http://crosbymichael.com/advanced-docker-volumes.html)
+- mount host directory to docker, host is the VM we use, not Macbook
+- `mkdir ~/www`, then create a docker with volume option.
 
-### Link Containers
+```
+dockeruser@docker-vm:~$ mkdir www
+dockeruser@docker-vm:~$ ls
+Desktop  Documents  Downloads  examples.desktop  Music  Pictures  Projects  Public  Templates  Videos  www
+dockeruser@docker-vm:~$ docker run -it --name wvolume -v ~/www ubuntu echo yo
+Unable to find image 'ubuntu' locally
+Pulling repository ubuntu
+86ce37374f40: Download complete 
+... [snip] ...
+```
+
+do a inspection of container `docker inspect 355b`
+
+```
+	"HostnamePath": "/var/lib/docker/containers/355bf74fd807e280be9927452b23e82109d14d590f8738b3b13b067b3eb17a91/hostname",
+    "HostsPath": "/var/lib/docker/containers/355bf74fd807e280be9927452b23e82109d14d590f8738b3b13b067b3eb17a91/hosts",
+... [snip] ...
+    "Volumes": {
+        "/home/dockeruser/www": "/var/lib/docker/vfs/dir/1ca0f6fa92754c571724da3e7153e65765cc2b02f3e19d9c36b44f5d79e22b17"
+    },
+    "VolumesRW": {
+        "/home/dockeruser/www": true
+    }
+```
+- data container
+- (**start from here later**)
