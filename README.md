@@ -109,6 +109,76 @@ ubuntu              14.04               86ce37374f40        4 days ago          
 busybox             latest              e72ac664f4f0        8 weeks ago         2.433 MB
 ```
 
+inspect the image we just created,
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker images rkuo/webserver
+REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+rkuo/webserver      latest              f595086394a8        35 minutes ago      231.8 MB
+dockeruser@docker-vm:~/Projects/webserver$ docker history f595
+IMAGE               CREATED             CREATED BY                                      SIZE
+f595086394a8        36 minutes ago      /bin/sh -c #(nop) EXPOSE map[80/tcp:{}]         0 B
+95c0a1aa50bb        36 minutes ago      /bin/sh -c echo 'hi everyone, from nginx cont   34 B
+d2a6866edd3e        36 minutes ago      /bin/sh -c apt-get install -y nginx             18.46 MB
+80bebd9cb2ac        About an hour ago   /bin/sh -c apt-get update                       20.65 MB
+a841d55ca903        About an hour ago   /bin/sh -c #(nop) MAINTAINER Richard Kuo "kuo   0 B
+86ce37374f40        4 days ago          /bin/sh -c #(nop) CMD [/bin/bash]               0 B
+dc07507cef42        4 days ago          /bin/sh -c apt-get update && apt-get dist-upg   0 B
+78e82ee876a2        4 days ago          /bin/sh -c sed -i 's/^#\s*\(deb.*universe\)$/   1.895 kB
+3f45ca85fedc        4 days ago          /bin/sh -c rm -rf /var/lib/apt/lists/*          0 B
+61cb619d86bc        4 days ago          /bin/sh -c echo '#!/bin/sh' > /usr/sbin/polic   194.8 kB
+5bc37dc2dfba        4 days ago          /bin/sh -c #(nop) ADD file:d11cc4a4310c270539   192.5 MB
+511136ea3c5a        17 months ago                                                       0 B
+dockeruser@docker-vm:~/Projects/webserver$ 
+```
+Run a container,
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker run -d -p 80 --name web rkuo/webserver nginx -g "daemon off;"
+216975f80cf25558beab3dabe876cafa758eed1964f529ed8781b5eb291b37cc
+```
+A container is created, to find out IPAddress and which host port mapped to 80,
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker inspect web | grep IPAddress
+        "IPAddress": "172.17.0.14",
+dockeruser@docker-vm:~/Projects/webserver$ docker ps -l
+CONTAINER ID        IMAGE                   COMMAND                CREATED             STATUS              PORTS                   NAMES
+216975f80cf2        rkuo/webserver:latest   nginx -g 'daemon off   31 minutes ago      Up 31 minutes       0.0.0.0:49153->80/tcp   web                 
+```
+With a web browser, we can use either 0.0.0.0:49153 or 172.17.0.14:80 to access index.html. 
+
+If you are using an Non-GUI based VM, we can use curl to test our container. Check whether we have curl install in the VM, for ubuntu, `dpkg -s curl`; if it is not installed, type `sudo apt-get install curl`. You may need to enter the password to install the package.
+
+```
+dockeruser@docker-vm:~/Projects/webserver$ curl http://0.0.0.0:49153
+hi everyone, from nginx container
+```
+
+You can create a images from your github account too. 
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker build -t="rkuo/webfromgit:v1" git://github.com/rkuo/learningDocker.git
+Sending build context to Docker daemon 57.34 kB
+Sending build context to Docker daemon 
+Step 0 : from ubuntu:14.04
+ ---> 86ce37374f40
+Step 1 : maintainer Richard Kuo "kuotie@gmail.com"
+ ---> Using cache
+ ---> a841d55ca903
+Step 2 : run apt-get update
+ ---> Using cache
+ ---> 80bebd9cb2ac
+Step 3 : run apt-get install -y nginx
+ ---> Using cache
+ ---> d2a6866edd3e
+Step 4 : run echo 'hi everyone, from nginx container'    > /usr/share/nginx/html/index.html
+ ---> Using cache
+ ---> 95c0a1aa50bb
+Step 5 : expose 80
+ ---> Using cache
+ ---> f595086394a8
+Successfully built f595086394a8
+dockeruser@docker-vm:~/Projects/webserver$ 
+``` 
+
+
 ### Persist Data 
 - volume (**start from here later**)
 - data container
