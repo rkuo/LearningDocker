@@ -110,6 +110,7 @@ busybox             latest              e72ac664f4f0        8 weeks ago         
 ```
 
 inspect the image we just created,
+
 ```
 dockeruser@docker-vm:~/Projects/webserver$ docker images rkuo/webserver
 REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
@@ -131,11 +132,13 @@ dc07507cef42        4 days ago          /bin/sh -c apt-get update && apt-get dis
 dockeruser@docker-vm:~/Projects/webserver$ 
 ```
 Run a container,
+
 ```
 dockeruser@docker-vm:~/Projects/webserver$ docker run -d -p 80 --name web rkuo/webserver nginx -g "daemon off;"
 216975f80cf25558beab3dabe876cafa758eed1964f529ed8781b5eb291b37cc
 ```
 A container is created, to find out IPAddress and which host port mapped to 80,
+
 ```
 dockeruser@docker-vm:~/Projects/webserver$ docker inspect web | grep IPAddress
         "IPAddress": "172.17.0.14",
