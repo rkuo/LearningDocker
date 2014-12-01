@@ -291,6 +291,3 @@ dockeruser@docker-vm:~/Projects/webserver$ curl 0.0.0.0:49153
 <h1>This is a test website</h1>
 </body>
 ```
-
-Data container (**start from here later**)
-

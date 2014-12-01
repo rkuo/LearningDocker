@@ -8,9 +8,9 @@ env refreshed_at 2014-11-30
 
 run apt-get update
 run apt-get -y -q install nginx
-run mkdir -p /var/www/html 
+run mkdir -p /var/www/html/website 
 
-add nginx/global.conf /etc/nginx/conf.d/      # with / at the end
+add nginx/global.conf /etc/nginx/conf.d/global.conf
 add nginx/nginx.conf /etc/nginx/nginx.conf
 
 expose 80
