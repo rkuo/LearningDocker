@@ -238,5 +238,59 @@ do a inspection of container `docker inspect 355b`
         "/home/dockeruser/www": true
     }
 ```
-- data container
-- (**start from here later**)
+
+Data Volume Example:
+
+- Create web content
+Define a Dockerfile with a hook to volume (to be defined later in run command)
+
+```
+# Version 0.0.2
+# This file needs to be in the host with Docker installed.
+# Reference for indix file, http://stackoverflow.com/questions/10674867/nginx-default-public-www-location
+
+from ubuntu:14.04
+maintainer Richard Kuo "kuotie@gmail.com"
+env refreshed_at 2014-11-30
+
+run apt-get update
+run apt-get -y -q install nginx
+run mkdir -p /var/www/html/website 	# map to host directory in run
+
+add nginx/global.conf /etc/nginx/conf.d/global.conf
+add nginx/nginx.conf /etc/nginx/nginx.conf
+
+expose 80
+```
+
+Build image,
+
+```
+dockeruser@docker-vm:~/Projects/webserver$ docker build -t rkuo/nginx:v2 .
+```
+
+Fetch content,
+
+```
+dockeruser@docker-vm:~/Projects/webserver/website$ wget http://www.dockerbook.com/code/5/sample/website/
+--2014-11-30 18:50:25--  http://www.dockerbook.com/code/5/sample/website/
+... [snip] ...
+```
+
+Create container and link the data from host to container,
+
+```
+dockeruser@docker-vm:~/Projects/webserver$ sudo docker run -d -p 80 --name website -v $PWD/website:/var/www/html/website rkuo/nginx:v6 nginx
+[sudo] password for dockeruser: 
+778222613ed9e4dd44b599b9e781590ac8debb9deff95d3dbc7e7f906d6c965c
+dockeruser@docker-vm:~/Projects/webserver$ curl 0.0.0.0:49153
+<head>
+<title>Test website</title>
+</head>
+<body>
+<h1>This is a test website</h1>
+</body>
+```
+
+Data container (**start from here later**)
+
